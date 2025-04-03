@@ -82,6 +82,11 @@ app.get('/', (req, res) => {
     res.send("Application is working!")
 })
 
+app.get('/profile', (req, res) => {
+  //TODO RENDER THE LOGIN PAGE
+  res.render('pages/profile')
+})
+
 app.get('/login', (req, res) => {
     //TODO RENDER THE LOGIN PAGE
     res.render('pages/login')
