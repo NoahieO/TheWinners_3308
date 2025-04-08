@@ -29,4 +29,71 @@ describe('Server!', () => {
 
 // *********************** TODO: WRITE 2 UNIT TESTCASES **************************
 
+describe('POST /register - Register API Tests', () => {
+  it('should register a new user successfully', done => {
+
+    chai
+      .request(server)
+      .post('/register')
+      .send({
+        username: 'testuser',
+        password: 'testpassword',
+      })
+      .redirects(0)
+      .end((err, res) => {
+        expect(res).to.have.status(302);
+        expect(res.headers.location).to.equal('/login');
+        done();
+      });
+  });
+
+  it('should fail to register with an existing username', done => {
+    chai
+      .request(server)
+      .post('/register')
+      .send({
+        username: 'existinguser',
+        password: 'testpassword',
+      })
+      .end((err, res) => {
+        expect(res).to.have.status(200);
+        expect(res.text).to.include('Username already exists!');
+        done();
+      });
+  });
+});
+
+
+
+describe('Redirect testing for protected routes', () => {
+  it('GET /discover should redirect to /login with 302 HTTP status code when not authenticated', done => {
+    chai
+    .request(server)
+    .get('/discover')
+    .redirects(0)
+    .end((err, res) => {
+      expect(res).to.have.status(302);
+      expect(res.headers.location).to.equal('/login');
+      done();
+    });
+});
+});
+
+describe('Negative login attempt - incorrect password', () => {
+  it('should return an error message for incorrect password', done => {
+    chai
+      .request(server)
+      .post('/login')
+      .send({
+        username: 'testuser',
+        password: 'wrongpassword',
+      })
+      .end((err, res) => {
+        expect(res).to.have.status(200);
+        expect(res.text).to.include('Incorrect username or password!');
+        done();
+      });
+  });
+});
+
 // ********************************************************************************
