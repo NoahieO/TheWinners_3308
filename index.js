@@ -87,7 +87,6 @@ app.get('/', (req, res) => {
 })
 
 app.get('/profile', (req, res) => {
-  //TODO RENDER THE LOGIN PAGE
   res.render('pages/profile')
 })
 
@@ -103,7 +102,6 @@ app.get('/home', (req, res) => {
 app.get('/register', (req, res) => {
     //TODO RENDER THE REGISTRATION PAGE
     res.render('pages/register');
-
 })
 
 app.post('/register', async (req, res) => {
@@ -111,7 +109,7 @@ app.post('/register', async (req, res) => {
 
   try {
       const hashedPassword = await bcrypt.hash(password, 10);
-      const insertQuery = 'INSERT INTO users(username, password) VALUES ($1, $2) RETURNING *;';
+      const insertQuery = 'INSERT INTO Users (Username, Password) VALUES ($1, $2);';
 
       await db.one(insertQuery, [username, hashedPassword]);
 
@@ -126,7 +124,8 @@ app.post('/register', async (req, res) => {
 
 app.post('/login', async (req, res) => {
   const { username, password } = req.body;
-  const searchQuery = 'SELECT * FROM users WHERE username = $1;';
+  
+  const searchQuery = 'SELECT UserID, Username, Password, Balance FROM Users WHERE Username = $1;';
 
   try {
       const user = await db.one(searchQuery, [username]);
@@ -134,16 +133,22 @@ app.post('/login', async (req, res) => {
       // Compare the hashed password
       const match = await bcrypt.compare(password, user.password);
       if (match) {
-          req.session.user = user; // Store user in session
+          req.session.user = {
+            userID: user.UserID,
+            username: user.Username,
+            balance: user.Balance
+          }; // Store user in session
           req.session.save(() => {
-              res.redirect('/discover'); // Redirect AFTER session is saved
+              res.redirect('/'); // Redirect AFTER session is saved
           });
       } else {
-          res.render('pages/login', { message: "Incorrect username or password!" });
+          res.render('pages/login');
+          console.log("Incorrect username or password!");
       }
   } catch (err) {
       console.error(err);
-      res.render('pages/login', { message: "User not found!" });
+      res.redirect('/register');
+      console.log('User not found!');
   }
 });
 
