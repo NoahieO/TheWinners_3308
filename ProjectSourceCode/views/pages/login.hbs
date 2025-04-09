@@ -74,6 +74,10 @@
     <div class="container">
         <h2>Login to Buff Bets!</h2>
 
+        {{#if message}}
+        <p style="color: red; font-weight: bold; margin-top: 10px;">{{message}}</p>
+    {{/if}}
+
         <form action="/login" method="POST">
     <label for="username"> Username: </label>
     <input type="text" name="username" id="username" required />

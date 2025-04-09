@@ -115,7 +115,7 @@ app.post('/register', async (req, res) => {
       res.redirect('/login');
   } catch (err) {
       console.error(err);
-      res.render('pages/register', { message: "Error registering user. Try again." });
+      res.status(409).send('Error registering user');
   }
 });
 
@@ -135,11 +135,11 @@ app.post('/login', async (req, res) => {
               res.redirect('/discover'); // Redirect AFTER session is saved
           });
       } else {
-          res.render('pages/login', { message: "Incorrect username or password!" });
+        res.status(401).render('pages/login', { message: "Incorrect username or password!" });
       }
   } catch (err) {
-      console.error(err);
-      res.render('pages/login', { message: "User not found!" });
+    console.error(err);
+    res.status(401).render('pages/login', { message: "Incorrect username or password!" });
   }
 });
 
