@@ -1,0 +1,103 @@
+UAT Plan
+___________________________________________________
+1: The user adds a friend
+
+The goal of this test is to show a fundamental part of the buff bets site, 
+that is to search for a user, take that name and if it is actually a 
+valid user, assign that person as a friend to the user.
+
+If the user inputs an incorrect name, it will alert them that that doesn't 
+exist and reprompt the search
+
+Test Data:
+We need the user id of the person, the username of the chosen friend,
+and the friend id of said friend. The user id is a value stored via 
+postgres sql as a serial value, the username of the chose friend is 
+a value inputted via a post api request, and the friend id is the same
+as a user id but just stored as a relation in another table inside 
+postgres 
+
+Test Environment:
+We will be using Mocha and Chai for our testing. Mocha is the code that 
+tests our set up and runs, chai is the code that verifies the tests either 
+were or weren't successful.
+
+Test Results:
+The way we test the results is seeing that the index file outputs a 
+200 value at the end of the code for a successful input of the friend
+to the user and a 400 for if they put an incorrect name in.
+
+Testers:
+The testers for this will be the team building it which are all the people
+inside the github users
+
+_____________________________________________________________________
+2: The user makes an account
+
+This is the first step to making any bets or making any friends, 
+making a user. 
+
+This entails the user having a form presented to them that will be 
+creating their username, password.
+
+If a username is already in use it should alert the user that 
+they need to change their name and reprompt the form. 
+
+Test Data:
+The data needed will be all of the inputs from the user (username,
+password, and balance) and the table of users with usernames that we
+will be comparing against
+
+Test Environment:
+We will be using Mocha and Chai for our testing. Mocha is the code that 
+tests our set up and runs, chai is the code that verifies the tests either 
+were or weren't successful.
+
+Test Results:
+The way we test the results is seeing that the index file outputs a 
+200 value at the end of the code for a successful input of a user
+into the table and a 400 for if they put an existing users name.
+
+Testers:
+The testers for this will be the team building it which are all the people
+inside the github users
+
+__________________________________________________
+3: The user places a bet
+
+This is where the main functionality of what this application is for,
+the user needs to make a bet. After wanting to place a bet on either
+team (A or B which will be the name of a team), they will be prompted 
+how much money from their base amount (for each user it is always 500)
+and once they have put that amount in the place bet button will take them
+back out, confirming the bet.
+
+This will prompt an error if the user does not input a valid bet amount
+which is between inclusively 5-100 dollars. 
+
+It will also prompt an error if the user does not input a bet amount at 
+all. 
+
+It will also prompt an error if the user makes a bet more than the amount
+they currently have in their balance.
+
+Test Data:
+We need the amount the user will bet (a value gathered from the front end),
+the balance of the user (inside the Users table and found via user id),
+And the user id.
+
+Test Environment:
+We will be using Mocha and Chai for our testing. Mocha is the code that 
+tests our set up and runs, chai is the code that verifies the tests either 
+were or weren't successful.
+
+Test Results:
+The way we test the results is seeing that the index file outputs a 
+200 value at the end of the code for a successful place of a bet,
+into the table and a 400 error for invalid amount, 401 for no bet,
+402 for placing a bet more than the user's balance.
+
+Testers:
+The testers for this will be the team building it which are all the people
+inside the github users
+

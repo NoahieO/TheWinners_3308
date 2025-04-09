@@ -1,7 +1,7 @@
 -- Users Table
 CREATE TABLE Users (
     UserID SERIAL PRIMARY KEY,
-    Email VARCHAR(100) NOT NULL UNIQUE,
+    Username VARCHAR(100) NOT NULL UNIQUE,
     Password VARCHAR(100) NOT NULL,
     Balance INT DEFAULT 0
 );

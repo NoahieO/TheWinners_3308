@@ -1,5 +1,5 @@
 -- Sample Users
-INSERT INTO Users (Email, Password, Balance) VALUES
+INSERT INTO Users (Username, Password, Balance) VALUES
 ('DanielB@icloud.com', '1234', 1000),
 ('Chip@BuffBets.com', '5678', 500),
 ('Noah@buffbets.com', '1111', 800),

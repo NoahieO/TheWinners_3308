@@ -1,0 +1,25 @@
+this is going to be for when a user wants to make a friend
+(or really just a person they are wanting to view the bets of)
+then this line should work well
+
+it may need to be modified depending on how the emails or 
+usernames are implemented, one of them will be used for the 
+search query and as of making this (4/3/2025) emails are what I 
+will use, so yeah
+
+
+I will label each of the dollar sign references as I go
+__________________________________________
+QUERY LINES START
+
+friend_id_query = `SELECT Users.UserID FROM Users WHERE Users.Email = $1<this should be the input of whatever user they want to find>;`;
+
+friend_insert_query = `INSERT INTO Friendships (UserId, FriendID) VALUES ($1<The user id we grab from the API call>, $2<the other users id that we grabbed in the last line>);`;
+
+QUERY LINES END
+-------------------------------------------------
+Let me know if these need to be modified! Oh and just swap Email to Username when that change happens and it's all good!
+
+I swapped it, should be all good now!
+
+And this can fail if they just don't type the right name which I think is good and something yall can error handle for

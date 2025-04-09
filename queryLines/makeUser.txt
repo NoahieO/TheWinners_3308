@@ -1,0 +1,10 @@
+Hey here's the query for making a new user, same rules apply as mentioned in addFriends.txt
+
+QUERY LINE START
+___________________________________________
+
+Check_for_usernames_query = `SELECT Users.Username FROM Users WHERE Users.Username = $1 <this will be the inputted user name>;`;
+
+Insert_Query = `INSERT INTO Users (Username, Password, Balance) VALUES ($1 <username they inputted>, $2<password they inputted>, $3<balance they inputted>);`;
+____________________________________________
+QUERY LINE END

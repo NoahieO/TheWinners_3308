@@ -77,6 +77,10 @@ app.use(
 // <!-- Section 4 : API Routes -->
 // *****************************************************
 
+app.get('/welcome', (req, res) => {
+  res.json({status: 'success', message: 'Welcome!'});
+});
+
 // TODO - Include your API routes here
 app.get('/', (req, res) => {
     res.send("Application is working!")
@@ -90,6 +94,10 @@ app.get('/profile', (req, res) => {
 app.get('/login', (req, res) => {
     //TODO RENDER THE LOGIN PAGE
     res.render('pages/login')
+})
+app.get('/home', (req, res) => {
+  //TODO RENDER THE LOGIN PAGE
+  res.render('pages/home')
 })
 
 app.get('/register', (req, res) => {
@@ -177,12 +185,53 @@ app.get('/logout', (req, res) => {
   });
 });
 
+//ALL ODDS - API ENDPOINTS BELOW
+const api_key = process.env.API_KEY
 
-
-
-// *****************************************************
-// <!-- Section 5 : Start Server-->
-// *****************************************************
-// starting the server and keeping the connection open to listen for more requests
-app.listen(3000);
-console.log('Server is listening on port 3000');
+app.get('/odds', async (req, res)=> {
+  try {
+    const response = await axios({
+      method: 'get',
+      url: "https://api.the-odds-api.com/v4/sports/upcoming/odds",
+      params: {
+        apiKey: api_key,
+        regions: 'us',
+        oddsFormat: 'american'
+      }
+    });
+    const events = response.data
+    .filter(event => {
+      return (
+        event.bookmakers.length > 0 &&
+        event.bookmakers[0].markets?.length > 0 &&
+        event.bookmakers[0].markets[0].outcomes?.length > 0
+      );
+    })
+    .map(event => {
+      const bookmaker = event.bookmakers[0];
+      const moneyline = bookmaker?.markets.find(market => market.key === "h2h");
+      return {
+        id: event.id,
+        sport: event.sport_key,
+        date: event.commence_time,
+        home_team: event.home_team,
+        away_team: event.away_team,
+        odds: moneyline?.outcomes?.map(outcome => ({
+          team: outcome.name,
+          moneyline: outcome.price
+        })) || []
+      };
+    });
+    console.log(events[0].odds)
+    console.log('Remaining requests',response.headers['x-requests-remaining'])
+    console.log('Used requests',response.headers['x-requests-used'])
+  } catch (error) {
+    console.error(error);
+  }
+});
+ // *****************************************************
+ // <!-- Section 5 : Start Server-->
+ // *****************************************************
+ // starting the server and keeping the connection open to listen for more requests
+ app.listen(3000);
+ console.log('Server is listening on port 3000');
