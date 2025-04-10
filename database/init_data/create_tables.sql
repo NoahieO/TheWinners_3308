@@ -2,7 +2,7 @@
 CREATE TABLE Users (
     UserID SERIAL PRIMARY KEY,
     Username VARCHAR(100) NOT NULL UNIQUE,
-    Password VARCHAR(100) NOT NULL,
+    Password VARCHAR(200) NOT NULL,
     Balance INT DEFAULT 0
 );
 
