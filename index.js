@@ -197,7 +197,7 @@ app.post('/register', async (req, res) => {
   try {
 
       const searchQuery = `SELECT * FROM Users WHERE Users.Username = $1`;
-      const [duplicates] = await db.one(searchQuery, [username]);
+      const duplicates = await db.any(searchQuery, [username]);
 
       if(duplicates.length > 0){
         res.render('pages/register', {message: "Username Already Exists."});
