@@ -258,7 +258,13 @@ app.get('/discover', isAuthenticated, async (req, res) => {
 
 app.get('/logout', (req, res) => {
   req.session.destroy(() => {
-      res.render('pages/logout'); // Render the logout page without redirecting
+      res.render('pages/login'); // Render the logout page without redirecting
+  });
+});
+
+app.get('/profile', (req, res) => {
+  req.session.destroy(() => {
+      res.render('pages/profile'); // Render the logout page without redirecting
   });
 });
 
