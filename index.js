@@ -222,7 +222,7 @@ app.post('/register', async (req, res) => {
 
 app.post('/login', async (req, res) => {
   const { username, password } = req.body;
-  const searchQuery = 'SELECT * FROM users WHERE username = $1;';
+  const searchQuery = 'SELECT * FROM Users WHERE Username = $1;';
 
   try {
       const user = await db.one(searchQuery, [username]);
