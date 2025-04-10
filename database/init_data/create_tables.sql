@@ -53,7 +53,7 @@ CREATE TABLE Transactions (
 CREATE VIEW UserBetHistory AS
 SELECT 
     B.BetID,
-    U.Email AS UserEmail,
+    U.Username AS Username,
     E.Description AS Event,
     E.Sport,
     B.BetType,
