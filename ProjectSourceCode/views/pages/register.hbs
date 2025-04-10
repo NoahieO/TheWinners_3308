@@ -67,6 +67,23 @@
             font-size: 14px;
             color: #aaa;
         }
+
+        .login-link {
+            margin-top: 15px;
+            font-size: 16px;
+            color: #cfb87c;
+        }
+
+        .login-link a {
+            color: #cfb87c;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        .login-link a:hover {
+            text-decoration: underline;
+        }
+
     </style>
 </head>
 <body>
@@ -82,10 +99,11 @@
             <input type="password" name="password" id="password" required />
             
             <input type="submit" value="Register!" />
-            
         </form>
 
-    
+        <div class="login-link">
+            Already have an account? <a href="/login">Login</a>
+        </div>
     </div>
 
 </body>
