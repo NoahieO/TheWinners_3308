@@ -87,10 +87,7 @@ app.get('/', (req, res) => {
     res.send("Application is working!")
 })
 
-app.get('/login', (req, res) => {
-    //TODO RENDER THE LOGIN PAGE
-    res.render('pages/login')
-})
+
 app.get('/home', async (req, res) => {
   try {
     const response = await axios({
@@ -146,22 +143,38 @@ app.get('/home', async (req, res) => {
 })
 
 app.get('/register', (req, res) => {
-    //TODO RENDER THE REGISTRATION PAGE
     res.render('pages/register');
-
 })
 
 app.post('/register', async (req, res) => {
   const { username, password } = req.body;
 
+  
+  
+
   try {
       const hashedPassword = await bcrypt.hash(password, 10);
-      const insertQuery = 'INSERT INTO users(username, password) VALUES ($1, $2) RETURNING *;';
 
-      await db.one(insertQuery, [username, hashedPassword]);
+      //must look for any identical usernames, if so then don't go to the next part and redo the form and alert the user
 
-      // Redirect to login after successful registration
-      res.redirect('/login');
+      const searchQuery = `SELECT * FROM Users WHERE Users.Username = $1`;
+
+      const [duplicates] = await db.any(searchQuery, [username]);
+
+      if (duplicates.length > 0){
+        res.render('pages/register', {message: "Username Already Exists"});
+      }
+
+      else{
+        const insertQuery = 'INSERT INTO Users(Username, Password) VALUES ($1, $2) RETURNING *;';
+
+        await db.one(insertQuery, [username, hashedPassword]);
+
+        // Redirect to login after successful registration
+        res.redirect('/login');
+      }
+
+      
   } catch (err) {
       console.error(err);
       res.render('pages/register', { message: "Error registering user. Try again." });
@@ -169,9 +182,13 @@ app.post('/register', async (req, res) => {
 });
 
 
+app.get('/login', (req, res) => {
+  res.render('pages/login')
+})
+
 app.post('/login', async (req, res) => {
   const { username, password } = req.body;
-  const searchQuery = 'SELECT * FROM users WHERE username = $1;';
+  const searchQuery = 'SELECT * FROM Users WHERE Username = $1;';
 
   try {
       const user = await db.one(searchQuery, [username]);
