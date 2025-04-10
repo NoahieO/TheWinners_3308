@@ -16,18 +16,28 @@
           <li class="nav-item mx-3">
             <a class="nav-link text-black" href="/Home">Home</a>
           </li>
-          <li class="nav-item mx-3">
-            <a class="nav-link text-black" href="/login">Login</a>
-          </li>
-          <li class="nav-item mx-3">
-            <a class="nav-link text-black" href="/register">Register</a>
-          </li>
         </ul>
-        <div class="nav-item mx-3">
-          <a class="nav-link text-black" href="/logout">Logout</a>
+        <div class="nav-item mx-3" id="auth-link">
+          <a class="nav-link text-black" href="/login">Login</a>
         </div>
       </div>
     </div>
   </nav>
 </header>
+
+<script>
+  // Placeholder for authentication status (change 'false' to 'true' to simulate login)
+  let isLoggedIn = false;  // Change to true to simulate a logged-in user
+
+  // Select the auth-link container
+  const authLink = document.getElementById('auth-link');
+
+  // Update the navbar based on login status
+  if (isLoggedIn) {
+    authLink.innerHTML = '<a class="nav-link text-black" href="/logout">Logout</a>';
+  } else {
+    authLink.innerHTML = '<a class="nav-link text-black" href="/login">Login</a>';
+  }
+</script>
+
 <link rel="stylesheet" href="/style.css">
