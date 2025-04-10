@@ -192,14 +192,27 @@ app.get('/register', (req, res) => {
 app.post('/register', async (req, res) => {
   const { username, password } = req.body;
 
+  
+
   try {
-      const hashedPassword = await bcrypt.hash(password, 10);
-      const insertQuery = 'INSERT INTO users(username, password) VALUES ($1, $2) RETURNING *;';
 
-      await db.one(insertQuery, [username, hashedPassword]);
+      const searchQuery = `SELECT * FROM Users WHERE Users.Username = $1`;
+      const [duplicates] = await db.one(searchQuery, [username]);
 
-      // Redirect to login after successful registration
-      res.redirect('/login');
+      if(duplicates.length > 0){
+        res.render('pages/register', {message: "Username Already Exists."});
+      }
+
+      else{
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const insertQuery = 'INSERT INTO Users(Username, Password) VALUES ($1, $2) RETURNING *;';
+
+        await db.one(insertQuery, [username, hashedPassword]);
+
+        // Redirect to login after successful registration
+        res.redirect('/login');
+      }
+      
   } catch (err) {
       console.error(err);
       res.render('pages/register', { message: "Error registering user. Try again." });
