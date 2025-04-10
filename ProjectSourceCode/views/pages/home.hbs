@@ -15,41 +15,89 @@
         }
 
         .container {
-            width: 80%;
+            width: 90%;
             margin: 50px auto;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
         }
 
         .card {
-            background: #000; /* Black Background */
-            color: #cfb87c; /* CU Boulder Gold */
-            padding: 20px;
-            margin: 15px;
-            border-radius: 10px;
-            box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.3);
-            display: inline-block;
-            width: 30%;
-        }
+    background: #000;
+    color: #cfb87c;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.3);
+    width: 300px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    /* height: 350px;  <-- REMOVE THIS */
+}
+
 
         .card h3 {
             margin: 10px 0;
         }
+
+        .bet-form {
+            display: none;
+            margin-top: 15px;
+        }
+
+        .card button {
+            margin-top: auto;
+            padding: 8px 12px;
+            background-color: #cfb87c;
+            color: #000;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .card input, .card select {
+            margin: 5px 0;
+            padding: 5px;
+            width: 100%;
+        }
     </style>
 </head>
 <body>
+    <h2 style="margin-top: 50px;">Upcoming Games</h2>
+
     <div class="container">
-        <h2>Upcoming Games</h2>
         {{#each events}}
             <div class="card">
-                <h3>{{date}}</h3>
-                <p>{{home_team}} vs {{away_team}}</p>
-                
-                {{!-- <p>{{odds[0].team}}: {{odds[0].moneyline}}</p>
-                <p>{{odds[1].team}}: {{odds[1].moneyline}}</p>                 --}}
-                {{#each odds}}
-                    <p>{{team}}: {{moneyline}}</p>
-                {{/each}}
+                <div>
+                    <h3>{{date}}</h3>
+                    <p>{{home_team}} vs {{away_team}}</p>
+                    {{#each odds}}
+                        <p>{{team}}: {{moneyline}}</p>
+                    {{/each}}
+                </div>
+
+                <button onclick="toggleForm(this)">Place Bet</button>
+
+                <form class="bet-form">
+                    <select name="team" required>
+                        <option value="" disabled selected>Select Team</option>
+                        {{#each odds}}
+                            <option value="{{team}}">{{team}}</option>
+                        {{/each}}
+                    </select>
+                    <input type="number" name="amount" placeholder="Bet Amount ($)" required min="1">
+                    <button type="submit">Submit</button>
+                </form>
             </div>
         {{/each}}
     </div>
+
+    <script>
+        function toggleForm(button) {
+            const form = button.nextElementSibling;
+            form.style.display = form.style.display === 'block' ? 'none' : 'block';
+        }
+    </script>
 </body>
 </html>
