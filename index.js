@@ -213,7 +213,7 @@ app.post('/login', async (req, res) => {
       if (match) {
           req.session.user = user; // Store user in session
           req.session.save(() => {
-              res.redirect('/discover'); // Redirect AFTER session is saved
+              res.redirect('/home'); // Redirect AFTER session is saved
           });
       } else {
           res.render('pages/login', { message: "Incorrect username or password!" });
