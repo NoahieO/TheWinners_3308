@@ -68,6 +68,11 @@ app.use(
   })
 );
 
+app.use((req, res, next) => {
+  res.locals.user = req.session.user || null;
+  next();
+});
+
 app.use(
   bodyParser.urlencoded({
     extended: true,
@@ -139,6 +144,7 @@ app.get('/home', async (req, res) => {
     console.log('Used requests',response.headers['x-requests-used'])
     res.render('pages/home', {
       events: events,
+      isLoggenIn: req.session.user !== undefined,
     })
   } catch (error) {
     console.error(error);
@@ -231,30 +237,6 @@ function isAuthenticated(req, res, next) {
       res.redirect('/login'); // Not logged in, redirect to login page
   }
 }
-app.get('/discover', isAuthenticated, async (req, res) => {
-  try {
-      const response = await axios({
-          url: `https://app.ticketmaster.com/discovery/v2/events.json`,
-          method: 'GET',
-          dataType: 'json',
-          headers: {
-              'Accept-Encoding': 'application/json',
-          },
-          params: {
-              apikey: process.env.API_KEY,
-              keyword: 'music', // Change keyword as needed
-              size: 10 // Fetch 10 events
-          },
-      });
-
-      const events = response.data._embedded?.events || []; // Extract events safely
-      res.render('pages/discover', { events });
-
-  } catch (error) {
-      console.error(error);
-      res.render('pages/discover', { events: [], message: "Failed to fetch events" });
-  }
-});
 
 app.get('/logout', (req, res) => {
   req.session.destroy(() => {
@@ -262,7 +244,7 @@ app.get('/logout', (req, res) => {
   });
 });
 
-app.get('/profile', (req, res) => {
+app.get('/profile', isAuthenticated,(req, res) => {
   req.session.destroy(() => {
       res.render('pages/profile'); // Render the logout page without redirecting
   });
