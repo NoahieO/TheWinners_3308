@@ -1,0 +1,3 @@
+SELECT * FROM UserBetHistory 
+WHERE Username = "Username"
+ORDER BY Time DESC;
