@@ -1,0 +1,17 @@
+SELECT 
+    B.BetID,
+    B.UserID,
+    E.EventID,
+    E.Description AS EventDescription,
+    E.Sport,
+    E.Time AS EventTime,
+    E.Team1,
+    E.Team2,
+    B.BetType,
+    B.BetDetail,
+    B.Amount,
+    E.WinLose AS EventOutcome,
+    B.WinLose AS BetOutcome
+FROM Bets B
+JOIN Events E ON B.EventID = E.EventID
+WHERE B.UserID = $1 AND E.EventID = $2;
