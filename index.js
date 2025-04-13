@@ -150,39 +150,7 @@ app.get('/home', async (req, res) => {
     console.error(error);
   }
 })
-
-app.get('/profile', async (req, res) => {
-  //querying for events that user bet on logic needed here
-  const select_query = 
-  `SELECT 
-      B.BetID,
-      B.UserID,
-      E.EventID,
-      E.Description AS EventDescription,
-      E.Sport,
-      E.Time AS EventTime,
-      B.BetType,
-      B.BetDetail,
-      B.Amount,
-      E.WinLose AS EventOutcome,
-      B.WinLose AS BetOutcome
-    FROM Bets B
-  JOIN Events E ON B.EventID = E.EventID
-  WHERE B.UserID = <your_user_id_here>;`;
-  try {
-    const response = await axios({
-      method: 'get',
-      url: "https://api.the-odds-api.com/v4/sports/scores",
-      params: {
-        apiKey: api_key,
-        daysFrom: '3'
-      }
-    });
-  } catch (error) {
-    console.error(error);
-  }
-})
-
+// -- Register User --
 app.get('/register', (req, res) => {
     //TODO RENDER THE REGISTRATION PAGE
     res.render('pages/register');
@@ -219,7 +187,7 @@ app.post('/register', async (req, res) => {
   }
 });
 
-
+// -- Login in User --
 app.post('/login', async (req, res) => {
   const { username, password } = req.body;
   const searchQuery = 'SELECT * FROM Users WHERE Username = $1;';
@@ -250,7 +218,7 @@ function isAuthenticated(req, res, next) {
       res.redirect('/login'); // Not logged in, redirect to login page
   }
 }
-
+// -- Log User out
 app.get('/logout', (req, res) => {
   req.session.destroy(() => {
       res.render('pages/login'); // Render the logout page without redirecting
@@ -263,6 +231,78 @@ app.get('/profile', isAuthenticated,(req, res) => {
   });
 });
 
+// -- Bets Routes --
+app.post('/bets', isAuthenticated, async (req, res) => {
+  const { eventId, amount, betType, betDetail } = req.body;
+  const userId = req.session.user.userid;
+
+  try {
+    const { balance } = await db.one('SELECT Balance FROM Users WHERE UserID = $1', [userId]);
+    if (balance < amount) {
+      return res.status(400).json({ error: 'Insufficient balance' });
+    }
+
+    await db.none(
+      `INSERT INTO Bets (UserID, EventID, Amount, BetType, BetDetail) 
+       VALUES ($1, $2, $3, $4, $5)`,
+      [userId, eventId, amount, betType, betDetail]
+    );
+
+    await db.none('UPDATE Users SET Balance = Balance - $1 WHERE UserID = $2', [amount, userId]);
+    await db.none('INSERT INTO Transactions (UserID, Amount, Type) VALUES ($1, $2, \'bet\')', [userId, -amount]);
+
+    res.redirect('/my-bets');
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Error placing bet.");
+  }
+});
+
+// -- Transactions Route --
+app.get('/transactions', isAuthenticated, async (req, res) => {
+  const userId = req.session.user.userid;
+
+  try {
+    const transactions = await db.any(
+      `SELECT * FROM Transactions WHERE UserID = $1 ORDER BY Timestamp DESC`,
+      [userId]
+    );
+
+    res.render('pages/transactions', { transactions });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Error fetching transactions.");
+  }
+});
+
+// -- My Bets Route
+app.get('/my-bets', isAuthenticated, async (req, res) => {
+  const username = req.session.user.username;
+
+  try {
+    const activeBets = await db.any(
+      `SELECT * FROM UserBetHistory 
+       WHERE Username = $1 AND WinLose IS NULL 
+       ORDER BY Time DESC`,
+      [username]
+    );
+
+    const pastBets = await db.any(
+      `SELECT * FROM UserBetHistory 
+       WHERE Username = $1 AND WinLose IS NOT NULL 
+       ORDER BY Time DESC`,
+      [username]
+    );
+
+    res.render('pages/my-bets', {
+      activeBets,
+      pastBets,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Error retrieving bets.");
+  }
+});
 
 
 
