@@ -145,6 +145,38 @@ app.get('/home', async (req, res) => {
   }
 })
 
+app.get('/profile', async (req, res) => {
+  //querying for events that user bet on logic needed here
+  const select_query = 
+  `SELECT 
+      B.BetID,
+      B.UserID,
+      E.EventID,
+      E.Description AS EventDescription,
+      E.Sport,
+      E.Time AS EventTime,
+      B.BetType,
+      B.BetDetail,
+      B.Amount,
+      E.WinLose AS EventOutcome,
+      B.WinLose AS BetOutcome
+    FROM Bets B
+  JOIN Events E ON B.EventID = E.EventID
+  WHERE B.UserID = <your_user_id_here>;`;
+  try {
+    const response = await axios({
+      method: 'get',
+      url: "https://api.the-odds-api.com/v4/sports/scores",
+      params: {
+        apiKey: api_key,
+        daysFrom: '3'
+      }
+    });
+  } catch (error) {
+    console.error(error);
+  }
+})
+
 app.get('/register', (req, res) => {
     //TODO RENDER THE REGISTRATION PAGE
     res.render('pages/register');
