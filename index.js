@@ -97,10 +97,16 @@ app.get('/profile', (req, res) => {
   res.render('pages/profile')
 })
 
+app.get('/friends', (req, res) => {
+  //TODO RENDER THE LOGIN PAGE
+  res.render('pages/friends')
+})
+
 app.get('/login', (req, res) => {
     //TODO RENDER THE LOGIN PAGE
     res.render('pages/login')
 })
+
 app.get('/home', async (req, res) => {
   try {
     const response = await axios({
@@ -236,7 +242,9 @@ app.get('/profile', isAuthenticated,(req, res) => {
   });
 });
 
-
+app.post('/add_friend', isAuthenticated, (req, res) => {
+  
+})
 
 
 

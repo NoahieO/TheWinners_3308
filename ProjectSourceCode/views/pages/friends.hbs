@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - Buff Bets</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #cfb87c; /* CU Boulder Gold */
+            color: #000;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            width: 80%;
+            margin: 30px auto;
+            background: #000; /* Black Background */
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.3);
+            color: #cfb87c;
+        }
+
+        h1, h2 {
+            text-align: center;
+            color: #cfb87c;
+        }
+
+        .top-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .account-balance, .won-bets {
+            font-size: 20px;
+            font-weight: bold;
+            background-color: #333;
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: 2px solid #cfb87c;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: #222;
+            color: #fff;
+        }
+
+        th, td {
+            padding: 12px;
+            border: 1px solid #cfb87c;
+            text-align: center;
+        }
+
+        th {
+            background-color: #444;
+        }
+
+        tr:nth-child(even) {
+            background-color: #333;
+        }
+
+        .win {
+            color: #4caf50;
+            font-weight: bold;
+        }
+
+        .loss {
+            color: #f44336;
+            font-weight: bold;
+        }
+
+        label {
+            display: block;
+            margin-top: 10px;
+            font-size: 18px;
+            color: #cfb87c; /* Gold Text */
+        }
+
+        input[type="text"], input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 2px solid #cfb87c; /* Gold Border */
+            border-radius: 5px;
+            background-color: #333; /* Dark Background */
+            color: #fff; /* White Text */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <form action="/add_friend" method="POST">
+            <label for="friend">Add a friend:</label>
+            <input type="text" name="friend" placeholder="Enter friend's username"/>
+        </form>
+    </div>
+</body>
