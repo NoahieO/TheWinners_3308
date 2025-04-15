@@ -24,7 +24,16 @@ const hbs = handlebars.create({
     layoutsDir: path.join(__dirname, 'ProjectSourceCode', 'views', 'layouts'),
     partialsDir: path.join(__dirname, 'ProjectSourceCode', 'views', 'partials'),
 });
-  
+
+const moment = require('moment');
+
+// Register Handlebars helpers
+hbs.handlebars.registerHelper('formatDate', function (timestamp) {
+  return moment(timestamp).format('MM/DD/YYYY');
+});
+
+hbs.handlebars.registerHelper('eq', (a, b) => a === b);
+
 
 
 // database configuration
@@ -195,7 +204,7 @@ app.post('/login', async (req, res) => {
   try {
       const user = await db.one(searchQuery, [username]);
 
-      // Compare the hashed password
+      // -- Compare the hashed password --
       const match = await bcrypt.compare(password, user.password);
       if (match) {
           req.session.user = user; // Store user in session
@@ -218,17 +227,47 @@ function isAuthenticated(req, res, next) {
       res.redirect('/login'); // Not logged in, redirect to login page
   }
 }
-// -- Log User out
+// -- Log User out --
 app.get('/logout', (req, res) => {
   req.session.destroy(() => {
       res.render('pages/login'); // Render the logout page without redirecting
   });
 });
 
-app.get('/profile', isAuthenticated,(req, res) => {
-  req.session.destroy(() => {
-      res.render('pages/profile'); // Render the logout page without redirecting
-  });
+app.get('/profile', isAuthenticated, async (req, res) => {
+  const userId = req.session.user.userid;
+
+  try {
+    // -- Get current balance --
+    const { balance } = await db.one(
+      'SELECT Balance FROM Users WHERE UserID = $1',
+      [userId]
+    );
+
+    // -- Count won bets --
+    const { count: wonCount } = await db.one(
+      `SELECT COUNT(*) FROM Bets WHERE UserID = $1 AND WinLose = 'Win'`,
+      [userId]
+    );
+
+    // -- Get past bets --
+    const pastBets = await db.any(
+      `SELECT EventID, Amount, WinLose, Payout, Timestamp 
+       FROM Bets 
+       WHERE UserID = $1 
+       ORDER BY Timestamp DESC`,
+      [userId]
+    );
+
+    res.render('pages/profile', {
+      balance,
+      wonCount,
+      pastBets
+    });
+  } catch (err) {
+    console.error('Error loading profile:', err);
+    res.status(500).send('Error loading profile.');
+  }
 });
 
 // -- Bets Routes --
