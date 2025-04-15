@@ -153,7 +153,7 @@ app.get('/home', async (req, res) => {
     console.log('Used requests',response.headers['x-requests-used'])
     res.render('pages/home', {
       events: events,
-      isLoggenIn: req.session.user !== undefined,
+      isLoggedIn: req.session.user !== undefined,
     })
   } catch (error) {
     console.error(error);
