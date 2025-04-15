@@ -24,18 +24,16 @@
         }
 
         .card {
-    background: #000;
-    color: #cfb87c;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.3);
-    width: 300px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    /* height: 350px;  <-- REMOVE THIS */
-}
-
+            background: #000;
+            color: #cfb87c;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.3);
+            width: 300px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
 
         .card h3 {
             margin: 10px 0;
@@ -78,30 +76,33 @@
                 </div>
 
                 {{#if ../isLoggenIn}}
-                <button onclick="toggleForm(this)">Place Bet</button>
+                    <button onclick="toggleForm(this)">Place Bet</button>
 
-                <form class="bet-form">
-                    <select name="team" required>
-                        <option value="" disabled selected>Select Team</option>
-                        {{#each odds}}
-                            <option value="{{team}}">{{team}}</option>
-                        {{/each}}
-                    </select>
-                    <input type="number" name="amount" placeholder="Bet Amount ($)" required min="1">
-                    <button type="submit">Submit</button>
-                </form>
+                    <form class="bet-form" action="/bets" method="POST">
+                        <input type="hidden" name="eventId" value="{{id}}">
+                        <select name="betDetail" required>
+                            <option value="" disabled selected>Select Team</option>
+                            {{#each odds}}
+                                <option value="{{team}}">{{team}}</option>
+                            {{/each}}
+                        </select>
+                        <input type="number" name="amount" placeholder="Bet Amount ($)" required min="1">
+                        <input type="hidden" name="betType" value="moneyline">
+                        <button type="submit">Submit</button>
+                    </form>
                 {{else}}
                     <p>
-  <a href="/login" style=
-    "display: inline-block;
-    color: #000;
-    background-color: #cfb87c;
-    padding: 8px 16px;
-    border-radius: 5px;
-    text-decoration: none;
-    font-weight: bold;
-    border: 2px solid #cfb87c;">
-    Login</a> to place a bet.</p>
+                        <a href="/login" style="
+                            display: inline-block;
+                            color: #000;
+                            background-color: #cfb87c;
+                            padding: 8px 16px;
+                            border-radius: 5px;
+                            text-decoration: none;
+                            font-weight: bold;
+                            border: 2px solid #cfb87c;">
+                            Login</a> to place a bet.
+                    </p>
                 {{/if}}
             </div>
         {{/each}}
