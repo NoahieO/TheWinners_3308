@@ -67,6 +67,23 @@
             font-size: 14px;
             color: #aaa;
         }
+
+        .register-link {
+            margin-top: 15px;
+            font-size: 16px;
+            color: #cfb87c;
+        }
+
+        .register-link a {
+            color: #cfb87c;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        .register-link a:hover {
+            text-decoration: underline;
+        }
+
     </style>
 </head>
 <body>
@@ -75,18 +92,19 @@
         <h2>Login to Buff Bets!</h2>
 
         <form action="/login" method="POST">
-    <label for="username"> Username: </label>
-    <input type="text" name="username" id="username" required />
+            <label for="username">Username:</label>
+            <input type="text" name="username" id="username" required />
 
-    <label for="password"> Password: </label>
-    <input type="password" name="password" id="password" required />
+            <label for="password">Password:</label>
+            <input type="password" name="password" id="password" required />
 
-    <input type="submit" value="Login!" />
-</form>
+            <input type="submit" value="Login!" />
+        </form>
 
-    
+        <div class="register-link">
+            Don't have an account? <a href="/register">Register</a>
+        </div>
     </div>
 
 </body>
 </html>
-

@@ -2,7 +2,7 @@
 CREATE TABLE Users (
     UserID SERIAL PRIMARY KEY,
     Username VARCHAR(100) NOT NULL UNIQUE,
-    Password VARCHAR(100) NOT NULL,
+    Password VARCHAR(200) NOT NULL,
     Balance INT DEFAULT 0
 );
 
@@ -53,7 +53,7 @@ CREATE TABLE Transactions (
 CREATE VIEW UserBetHistory AS
 SELECT 
     B.BetID,
-    U.Email AS UserEmail,
+    U.Username AS Username,
     E.Description AS Event,
     E.Sport,
     B.BetType,

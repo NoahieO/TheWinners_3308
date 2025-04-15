@@ -8,7 +8,7 @@ services:
       - "5432:5432"
     volumes:
       - THEWINNERS_3308:/var/lib/postgresql/data
-      - ./init_data:/docker-entrypoint-initdb.d
+      - ./database/init_data:/docker-entrypoint-initdb.d
 
   web:
     image: node:lts

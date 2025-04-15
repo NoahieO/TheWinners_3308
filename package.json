@@ -14,5 +14,5 @@
   "scripts": {
       "prestart": "npm install",
       "start": "nodemon index.js"
+    }
   }
-}

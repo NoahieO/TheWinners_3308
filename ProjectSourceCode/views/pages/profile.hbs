@@ -8,60 +8,124 @@
         body {
             font-family: Arial, sans-serif;
             background-color: #cfb87c; /* CU Boulder Gold */
-            color: #ffffff;
-            text-align: left;
+            color: #000;
             margin: 0;
             padding: 0;
         }
 
         .container {
-            width: 70%;
+            width: 80%;
             margin: 30px auto;
             background: #000; /* Black Background */
-            padding: 20px;
+            padding: 30px;
             border-radius: 10px;
             box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.3);
+            color: #cfb87c;
         }
 
-        h1 {
-            color: #cfb87c; /* CU Boulder Gold */
+        h1, h2 {
+            text-align: center;
+            color: #cfb87c;
         }
 
-        h5 {
-            color: #ffffff;
+        .top-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
         }
 
-        .list-container {
+        .account-balance, .won-bets {
+            font-size: 20px;
+            font-weight: bold;
+            background-color: #333;
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: 2px solid #cfb87c;
+        }
+
+        table {
             width: 100%;
-            margin: 10px auto;
-            background: #141414;
-            padding: 10px;
-            border-radius: 10px;
+            border-collapse: collapse;
+            background-color: #222;
+            color: #fff;
         }
 
-        .list-container p{
-            margin: 2px 0;
+        th, td {
+            padding: 12px;
+            border: 1px solid #cfb87c;
+            text-align: center;
         }
 
+        th {
+            background-color: #444;
+        }
+
+        tr:nth-child(even) {
+            background-color: #333;
+        }
+
+        .win {
+            color: #4caf50;
+            font-weight: bold;
+        }
+
+        .loss {
+            color: #f44336;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Profile</h1>
-        <h5>Name</h5>
-        <h5>Username</h5>
-        <div class="list-container">
-            <h5>Friends</h5>
-            <p>Friend 1</p>
-            <p>Friend 2</p>
-            <p>Friend 3</p>
+        <div class="top-info">
+            <div class="account-balance">Account Balance: $500</div>
+            <div class="won-bets">Total Bets Won: 3</div>
         </div>
-        <div class="list-container">
-            <h5>Bet History</h5>
-            <p>Bet 1</p>
-            <p>Bet 2</p>
-            <p>Bet 3</p>
-        </div>
+
+        <h2>Past Bets</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Event</th>
+                    <th>Wager</th>
+                    <th>Result</th>
+                    <th>Payout</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>04/01/2025</td>
+                    <td>CU vs Utah</td>
+                    <td>$50</td>
+                    <td class="win">Win</td>
+                    <td>$95</td>
+                </tr>
+                <tr>
+                    <td>03/28/2025</td>
+                    <td>CU vs Arizona</td>
+                    <td>$30</td>
+                    <td class="loss">Loss</td>
+                    <td>$0</td>
+                </tr>
+                <tr>
+                    <td>03/22/2025</td>
+                    <td>CU vs Oregon</td>
+                    <td>$40</td>
+                    <td class="win">Win</td>
+                    <td>$76</td>
+                </tr>
+                <tr>
+                    <td>03/15/2025</td>
+                    <td>CU vs USC</td>
+                    <td>$25</td>
+                    <td class="win">Win</td>
+                    <td>$48</td>
+                </tr>
+            </tbody>
+        </table>
     </div>
 </body>
 </html>
