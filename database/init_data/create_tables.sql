@@ -27,6 +27,7 @@ CREATE TABLE Bets (
     UserID INT REFERENCES Users(UserID) ON DELETE CASCADE,
     EventID INT REFERENCES Events(EventID) ON DELETE CASCADE,
     Amount INT NOT NULL,
+    Sport VARCHAR(100),
     BetType VARCHAR(20) CHECK (BetType IN ('Moneyline', 'Over/Under')),
     BetDetail VARCHAR(100), -- ex. 'CU -150', 'Over', 'Under'
     WinLose BOOLEAN
@@ -53,6 +54,7 @@ CREATE TABLE Transactions (
 CREATE VIEW UserBetHistory AS
 SELECT 
     B.BetID,
+    E.EventID,
     U.Username AS Username,
     E.Description AS Event,
     E.Sport,

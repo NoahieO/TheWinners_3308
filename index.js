@@ -235,9 +235,40 @@ app.get('/logout', (req, res) => {
 });
 
 app.get('/profile', isAuthenticated, async (req, res) => {
+  //API logic and settling bets
   const userId = req.session.user.userid;
-
   try {
+    //api logic and settling bets
+    const unsettledBets = await db.any(
+      `SELECT * FROM UserBetHistory 
+       WHERE UserID = $1 AND WinLose IS NULL 
+       ORDER BY Time DESC`,
+      [userId]
+    );
+    const uniqueSports = [...new Set(unsettledBets.map(bet => bet.sport_key))];
+
+    for (const sport of uniqueSports) {
+      const eventIDs = unsettledBets
+      .map(bet => {
+        if (bet.Sport = sport) {
+          return bet.EventID;
+        }
+      })
+      .join(',');
+      
+      const response = await axios({
+        method: 'get',
+        url: "https://api.the-odds-api.com/v4/sports/scores",
+        params: {
+          apiKey: api_key,
+          sport: sport,
+          eventIds: eventIDs
+        }
+      });
+      //rest of logic will be to group responses to an array, and then call a function to check if they won or lost.
+      //just pushing now cause I cannot work on it until tommorow.
+    }
+
     // -- Get current balance --
     const { balance } = await db.one(
       'SELECT Balance FROM Users WHERE UserID = $1',
@@ -264,6 +295,10 @@ app.get('/profile', isAuthenticated, async (req, res) => {
       wonCount,
       pastBets
     });
+    //show the status of the API quota
+    console.log('Remaining requests',response.headers['x-requests-remaining'])
+    console.log('Used requests',response.headers['x-requests-used'])
+
   } catch (err) {
     console.error('Error loading profile:', err);
     res.status(500).send('Error loading profile.');
@@ -272,7 +307,7 @@ app.get('/profile', isAuthenticated, async (req, res) => {
 
 // -- Bets Routes --
 app.post('/bets', isAuthenticated, async (req, res) => {
-  const { eventId, amount, betType, betDetail } = req.body;
+  const { eventId, amount, betType, betDetail, sport } = req.body;
   const userId = req.session.user.userid;
 
   try {
@@ -282,9 +317,9 @@ app.post('/bets', isAuthenticated, async (req, res) => {
     }
 
     await db.none(
-      `INSERT INTO Bets (UserID, EventID, Amount, BetType, BetDetail) 
-       VALUES ($1, $2, $3, $4, $5)`,
-      [userId, eventId, amount, betType, betDetail]
+      `INSERT INTO Bets (UserID, EventID, Amount, Sport, BetType, BetDetail) 
+       VALUES ($1, $2, $3, $4, $5, $6)`,
+      [userId, eventId, amount, sport, betType, betDetail]
     );
 
     await db.none('UPDATE Users SET Balance = Balance - $1 WHERE UserID = $2', [amount, userId]);
