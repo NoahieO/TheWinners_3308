@@ -241,8 +241,7 @@ app.get('/profile', isAuthenticated, async (req, res) => {
     //api logic and settling bets
     const unsettledBets = await db.any(
       `SELECT * FROM UserBetHistory 
-       WHERE UserID = $1 AND WinLose IS NULL 
-       ORDER BY Time DESC`,
+       WHERE UserID = $1 AND WinLose IS NULL`,
       [userId]
     );
     const uniqueSports = [...new Set(unsettledBets.map(bet => bet.Sport))];
@@ -304,11 +303,9 @@ app.get('/profile', isAuthenticated, async (req, res) => {
     const pastBets = await db.any(
       `SELECT EventID, Amount, WinLose, BetDetail, Time 
        FROM UserBetHistory 
-       WHERE UserID = $1 
-       ORDER BY Time DESC`,
+       WHERE UserID = $1`,
       [userId]
     );
-
     res.render('pages/profile', {
       balance,
       wonCount,
