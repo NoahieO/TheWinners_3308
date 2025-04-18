@@ -98,7 +98,7 @@ app.get('/welcome', (req, res) => {
 
 // TODO - Include your API routes here
 app.get('/', (req, res) => {
-    res.send("Application is working!")
+    res.redirect('/login')
 })
 
 app.get('/login', (req, res) => {
@@ -182,9 +182,9 @@ app.post('/register', async (req, res) => {
 
       else{
         const hashedPassword = await bcrypt.hash(password, 10);
-        const insertQuery = 'INSERT INTO Users(Username, Password) VALUES ($1, $2) RETURNING *;';
+        const insertQuery = 'INSERT INTO Users(Username, Password, Balance) VALUES ($1, $2, $3) RETURNING *;';
 
-        await db.one(insertQuery, [username, hashedPassword]);
+        await db.one(insertQuery, [username, hashedPassword, 500]);
 
         // Redirect to login after successful registration
         res.redirect('/login');
@@ -245,15 +245,12 @@ app.get('/profile', isAuthenticated, async (req, res) => {
        ORDER BY Time DESC`,
       [userId]
     );
-    const uniqueSports = [...new Set(unsettledBets.map(bet => bet.sport_key))];
-
+    const uniqueSports = [...new Set(unsettledBets.map(bet => bet.Sport))];
+    const all_scores = [];
     for (const sport of uniqueSports) {
       const eventIDs = unsettledBets
-      .map(bet => {
-        if (bet.Sport = sport) {
-          return bet.EventID;
-        }
-      })
+      .filter(bet => bet.Sport === sport)
+      .map(bet => bet.EventID)
       .join(',');
       
       const response = await axios({
@@ -265,9 +262,31 @@ app.get('/profile', isAuthenticated, async (req, res) => {
           eventIds: eventIDs
         }
       });
+      all_scores.push(...response.data)
       //rest of logic will be to group responses to an array, and then call a function to check if they won or lost.
       //just pushing now cause I cannot work on it until tommorow.
     }
+
+    for (const bet of unsettledBets) {
+      const match = all_scores.find(score => score.id === bet.EventID);
+      if (!match || !match.completed || !match.scores || match.scores.length === 0) {
+        continue;
+      }
+      const bet_team = match.scores.find(team => team.name === bet.BetDetail);
+      if (!bet_team) {
+        console.warn(`Could not find team ${bet.BetDetail} in scores for eventID: ${bet.EventID}`);
+        continue;
+      }
+      const didWin = match.scores
+      .filter(team => team.name !== bet.BetDetail)
+      .every(opponent => bet_team.score > opponent.score);
+
+      await db.none(
+        `UPDATE Bets SET WinLose = $1 WHERE UserID = $2 AND EventID = $3 AND BetDetail= $4`,
+        [didWin, userId, bet.EventID, bet.BetDetail]
+      );
+    } 
+
 
     // -- Get current balance --
     const { balance } = await db.one(
@@ -277,16 +296,16 @@ app.get('/profile', isAuthenticated, async (req, res) => {
 
     // -- Count won bets --
     const { count: wonCount } = await db.one(
-      `SELECT COUNT(*) FROM Bets WHERE UserID = $1 AND WinLose = 'Win'`,
+      `SELECT COUNT(*) FROM Bets WHERE UserID = $1 AND WinLose = true`,
       [userId]
     );
 
     // -- Get past bets --
     const pastBets = await db.any(
-      `SELECT EventID, Amount, WinLose, Payout, Timestamp 
-       FROM Bets 
+      `SELECT EventID, Amount, WinLose, BetDetail, Time 
+       FROM UserBetHistory 
        WHERE UserID = $1 
-       ORDER BY Timestamp DESC`,
+       ORDER BY Time DESC`,
       [userId]
     );
 
