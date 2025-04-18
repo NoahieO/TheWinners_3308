@@ -21,24 +21,15 @@ const api_key = process.env.API_KEY
 // create `ExpressHandlebars` instance and configure the layouts and partials dir.
 const hbs = handlebars.create({
     extname: 'hbs',
-    layoutsDir: path.join(__dirname, 'ProjectSourceCode', 'views', 'layouts'),
-    partialsDir: path.join(__dirname, 'ProjectSourceCode', 'views', 'partials'),
+    layoutsDir: path.join(__dirname, 'views', 'layouts'),
+    partialsDir: path.join(__dirname, 'views', 'partials'),
 });
-
-const moment = require('moment');
-
-// Register Handlebars helpers
-hbs.handlebars.registerHelper('formatDate', function (timestamp) {
-  return moment(timestamp).format('MM/DD/YYYY');
-});
-
-hbs.handlebars.registerHelper('eq', (a, b) => a === b);
-
+  
 
 
 // database configuration
 const dbConfig = {
-  host: 'db', // the database server
+  host: process.env.POSTGRES_HOST || 'db', // the database server
   port: 5432, // the database port
   database: process.env.POSTGRES_DB, // the database name
   user: process.env.POSTGRES_USER, // the user account to connect with
@@ -64,7 +55,7 @@ db.connect()
 // Register `hbs` as our view engine using its bound `engine()` function.
 app.engine('hbs', hbs.engine);
 app.set('view engine', 'hbs');
-app.set('views', path.join(__dirname, 'ProjectSourceCode', 'views'));
+app.set('views', path.join(__dirname, 'views'));
 
 app.use(bodyParser.json()); // specify the usage of JSON for parsing request body.
 
@@ -98,7 +89,7 @@ app.get('/welcome', (req, res) => {
 
 // TODO - Include your API routes here
 app.get('/', (req, res) => {
-    res.redirect('/login')
+    res.send("Application is working!")
 })
 
 app.get('/login', (req, res) => {
@@ -162,7 +153,7 @@ app.get('/home', async (req, res) => {
     console.error(error);
   }
 })
-// -- Register User --
+
 app.get('/register', (req, res) => {
     //TODO RENDER THE REGISTRATION PAGE
     res.render('pages/register');
@@ -185,10 +176,9 @@ app.post('/register', async (req, res) => {
 
       else{
         const hashedPassword = await bcrypt.hash(password, 10);
-        const insertQuery = 'INSERT INTO Users(Username, Password, Balance) VALUES ($1, $2, 500) RETURNING *;';
+        const insertQuery = 'INSERT INTO Users(Username, Password) VALUES ($1, $2) RETURNING *;';
 
         await db.one(insertQuery, [username, hashedPassword]);
-        
 
         // Redirect to login after successful registration
         res.redirect('/login');
@@ -200,7 +190,7 @@ app.post('/register', async (req, res) => {
   }
 });
 
-// -- Login in User --
+
 app.post('/login', async (req, res) => {
   const { username, password } = req.body;
   const searchQuery = 'SELECT * FROM Users WHERE Username = $1;';
@@ -208,7 +198,7 @@ app.post('/login', async (req, res) => {
   try {
       const user = await db.one(searchQuery, [username]);
 
-      // -- Compare the hashed password --
+      // Compare the hashed password
       const match = await bcrypt.compare(password, user.password);
       if (match) {
           req.session.user = user; // Store user in session
@@ -237,30 +227,6 @@ app.get('/logout', (req, res) => {
       res.render('pages/logout'); // Render the logout page without redirecting
   });
 });
-
-// -- Bets Routes --
-app.post('/bets', isAuthenticated, async (req, res) => {
-  const { eventId, amount, betType, betDetail } = req.body;
-  const userId = req.session.user.userid;
-
-  try {
-    
-    await db.none(
-      `INSERT INTO Bets (UserID, EventID, Amount, BetType, BetDetail) 
-       VALUES ($1, $2, $3, $4, $5)`,
-      [userId, eventId, amount, betType, betDetail]
-    );
-
-    await db.none('UPDATE Users SET Balance = Balance - $1 WHERE UserID = $2', [amount, userId]);
-    await db.none('INSERT INTO Transactions (UserID, Amount, Type) VALUES ($1, $2, \'bet\')', [userId, -amount]);
-
-    res.redirect('/profile');
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("Internal error placing bet.");
-  }
-});
-
 
 app.get('/profile', isAuthenticated, async (req, res) => {
   const username = req.session.user.username;

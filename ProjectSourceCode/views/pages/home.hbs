@@ -24,16 +24,17 @@
         }
 
         .card {
-            background: #000;
-            color: #cfb87c;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.3);
-            width: 300px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
+    background: #000;
+    color: #cfb87c;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.3);
+    width: 300px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
 
         .card h3 {
             margin: 10px 0;
@@ -62,7 +63,9 @@
     </style>
 </head>
 <body>
-    <h2 style="margin-top: 50px;">Upcoming Games</h2>
+    <body data-balance="{{balance}}">
+
+    <h2 style="margin-top: 50px;">🦬Upcoming Games🦬</h2>
 
     <div class="container">
         {{#each events}}
@@ -116,5 +119,47 @@
             form.style.display = form.style.display === 'block' ? 'none' : 'block';
         }
     </script>
+
+    <script>
+    function toggleForm(button) {
+        const form = button.nextElementSibling;
+        form.style.display = form.style.display === 'block' ? 'none' : 'block';
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+        const betForms = document.querySelectorAll(".bet-form");
+
+        betForms.forEach(form => {
+            form.addEventListener("submit", function(e) {
+                
+                const amountInput = this.querySelector('input[name="amount"]');
+                const teamSelect = this.querySelector('select[name="team"]');
+                const amount = parseFloat(amountInput.value);
+                const balance = parseFloat(document.body.dataset.balance); // see below
+
+                if(!betValidate(amount, balance)) e.preventDefault(); return;
+        
+                // this.reset();
+                //this.style.display = 'none';
+            });
+        });
+    });
+
+    function betValidate(amount, balance)
+    {
+        if (isNaN(amount) || amount <= 0) {
+            alert("Please enter a valid bet amount.");
+            return 0;
+        }
+
+        if (amount > balance) {
+            alert("Insufficient balance to place this bet.");
+            return 0;
+        }
+        alert("Bet placed! (Simulated)"); //I left this in but we can take it out, this just helps us to know for now
+        return 1;
+    }
+</script>
+
 </body>
 </html>

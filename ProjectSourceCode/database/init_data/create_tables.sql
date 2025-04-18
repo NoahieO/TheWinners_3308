@@ -1,3 +1,10 @@
+DROP TABLE IF EXISTS Transactions;
+DROP TABLE IF EXISTS Friendships;
+DROP TABLE IF EXISTS Bets;
+DROP TABLE IF EXISTS Events;
+DROP TABLE IF EXISTS Users;
+
+
 -- Users Table
 CREATE TABLE Users (
     UserID SERIAL PRIMARY KEY,
@@ -54,9 +61,15 @@ CREATE TABLE Transactions (
 CREATE VIEW UserBetHistory AS
 SELECT 
     B.BetID,
+<<<<<<<< HEAD:database/init_data/create_tables.sql
     B.EventID,
     U.Username AS Username,
     B.Sport,
+========
+    U.Username AS Username,
+    E.Description AS Event,
+    E.Sport,
+>>>>>>>> main:ProjectSourceCode/database/init_data/create_tables.sql
     B.BetType,
     B.BetDetail,
     B.Amount,
