@@ -242,8 +242,33 @@ app.get('/profile', isAuthenticated,(req, res) => {
   });
 });
 
-app.post('/add_friend', isAuthenticated, (req, res) => {
-  
+app.post('/add_friend', isAuthenticated, async (req, res) => {
+  const friend_username = req.body;
+  const searchQuery = 'SELECT Users.UserID FROM Users WHERE Users.Username = $1;';
+
+  try {
+    const friend_id = await db.any(searchQuery, [friend_username])
+
+    if(friend_id.length == 0) {
+      res.render('pages/friends', {message: "No user found"});
+    }
+    else{
+      const duplicateQuery = 'SELECT * FROM Friendships WHERE UserID = $1 AND FriendID = $2;';
+      const duplicates = await db.any(duplicateQuery, [req.session.user.userId, friend_id]);
+
+      if (duplicates.length > 0) {
+        res.render('pages/friends', {message: "Friend already added!"});
+      }
+
+      const insertQuery = 'INSERT INTO Friendships (UserID, FriendID) VALUES ($1, $2);';
+      await db.none(insertQuery, [req.session.user.userId, friend_id]);
+
+    }
+    
+  } catch(err) {
+    console.error(err);
+    res.render('pages/friends', {message: "User not found"})
+  }
 })
 
 

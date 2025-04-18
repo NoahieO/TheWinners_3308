@@ -14,7 +14,7 @@ QUERY LINES START
 
 friend_id_query = `SELECT Users.UserID FROM Users WHERE Users.Email = $1<this should be the input of whatever user they want to find>;`;
 
-friend_insert_query = `INSERT INTO Friendships (UserId, FriendID) VALUES ($1<The user id we grab from the API call>, $2<the other users id that we grabbed in the last line>);`;
+friend_insert_query = `INSERT INTO Friendships (UserID, FriendID) VALUES ($1<The user id we grab from the API call>, $2<the other users id that we grabbed in the last line>);`;
 
 QUERY LINES END
 -------------------------------------------------
