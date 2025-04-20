@@ -97,9 +97,25 @@ app.get('/profile', (req, res) => {
   res.render('pages/profile')
 })
 
-app.get('/friends', (req, res) => {
-  //TODO RENDER THE LOGIN PAGE
-  res.render('pages/friends')
+app.get('/friends', async (req, res) => {
+  //search for friends, then render the page and send friends info through
+  userId = req.session.user.userId;
+  friendSearch = 'SELECT * FROM Users INNER JOIN Friendships ON Users.UserID = Friendships.FriendID WHERE Friendships.UserID = $1 FOR JSON PATH;';
+
+  try {
+    const friends = await db.manyOrNone(friendSearch, [userId]);
+    const nofriends = false;
+    if (friends.length() == 0) nofriends = true; 
+
+    res.render('pages/friends', {friends: friends, nofriends: nofriends});
+  }
+  catch(err){
+    console.error(err);
+    res.render('pages/home', {message: 'Error loading friend list'});
+  }
+
+
+  res.render('pages/friends');
 })
 
 app.get('/login', (req, res) => {
@@ -263,6 +279,8 @@ app.post('/add_friend', isAuthenticated, async (req, res) => {
       const insertQuery = 'INSERT INTO Friendships (UserID, FriendID) VALUES ($1, $2);';
       await db.none(insertQuery, [req.session.user.userId, friend_id]);
 
+      //
+      res.render('pages/friends', {userid: req.session.user.userId});
     }
     
   } catch(err) {
