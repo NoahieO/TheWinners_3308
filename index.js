@@ -229,6 +229,58 @@ app.get('/logout', (req, res) => {
   });
 });
 
+app.get('/friends', async (req, res) => {
+  //search for friends, then render the page and send friends info through
+  userId = req.session.user.userId;
+  friendSearch = 'SELECT * FROM Users INNER JOIN Friendships ON Users.UserID = Friendships.FriendID WHERE Friendships.UserID = $1 FOR JSON PATH;';
+
+  try {
+    const friends = await db.manyOrNone(friendSearch, [userId]);
+    const nofriends = false;
+    if (friends.length() == 0) nofriends = true; 
+
+    res.render('pages/friends', {friends: friends, nofriends: nofriends});
+  }
+  catch(err){
+    console.error(err);
+    res.render('pages/home', {message: 'Error loading friend list'});
+  }
+ 
+})
+
+
+app.post('/add_friend', isAuthenticated, async (req, res) => {
+  const friend_username = req.body;
+  const searchQuery = 'SELECT Users.UserID FROM Users WHERE Users.Username = $1;';
+
+  try {
+    const friend_id = await db.any(searchQuery, [friend_username])
+
+    if(friend_id.length == 0) {
+      res.render('pages/friends', {message: "No user found"});
+    }
+    else{
+      const duplicateQuery = 'SELECT * FROM Friendships WHERE UserID = $1 AND FriendID = $2;';
+      const duplicates = await db.any(duplicateQuery, [req.session.user.userId, friend_id]);
+
+      if (duplicates.length > 0) {
+        res.render('pages/friends', {message: "Friend already added!"});
+      }
+
+      const insertQuery = 'INSERT INTO Friendships (UserID, FriendID) VALUES ($1, $2);';
+      await db.none(insertQuery, [req.session.user.userId, friend_id]);
+
+      //
+      res.render('pages/friends', {userid: req.session.user.userId});
+    }
+    
+  } catch(err) {
+    console.error(err);
+    res.render('pages/friends', {message: "User not found"})
+  }
+})
+
+
 // -- Bets Routes --
 app.post('/bets', isAuthenticated, async (req, res) => {
   const { eventId, amount, betType, betDetail } = req.body;
