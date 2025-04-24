@@ -12,7 +12,9 @@ const bodyParser = require('body-parser');
 const session = require('express-session'); // To set the session object. To store or access session data, use the `req.session`, which is (generally) serialized as JSON by the store.
 const bcrypt = require('bcryptjs'); //  To hash passwords
 const axios = require('axios'); // To make HTTP requests from our server. We'll learn more about it in Part C.
-const api_key = process.env.API_KEY
+const api_key = process.env.ODDS_API_KEY;
+
+
 
 // *****************************************************
 // <!-- Section 2 : Connect to DB -->
@@ -28,25 +30,21 @@ const hbs = handlebars.create({
   
 
 
-// database configuration
-const dbConfig = {
-  host: 'db', // the database server
-  port: 5432, // the database port
-  database: process.env.POSTGRES_DB, // the database name
-  user: process.env.POSTGRES_USER, // the user account to connect with
-  password: process.env.POSTGRES_PASSWORD, // the password of the user account
-};
+const db = pgp({
+  connectionString: process.env.DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: false // Render requires this for SSL
+  }
+});
 
-const db = pgp(dbConfig);
-
-// test your database
+// Test the database connection
 db.connect()
   .then(obj => {
-    console.log('Database connection successful'); // you can view this message in the docker compose logs
-    obj.done(); // success, release the connection;
+    console.log('Database connection successful');
+    obj.done();
   })
   .catch(error => {
-    console.log('ERROR:', error.message || error);
+    console.error('Database connection error:', error.message || error);
   });
 
 // *****************************************************
