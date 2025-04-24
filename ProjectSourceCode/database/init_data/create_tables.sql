@@ -27,7 +27,6 @@ CREATE TABLE Bets (
     UserID INT REFERENCES Users(UserID) ON DELETE CASCADE,
     EventID VARCHAR(200),
     Amount INT NOT NULL,
-    Sport VARCHAR(100),
     BetType VARCHAR(20) CHECK (BetType IN ('Moneyline', 'Over/Under')),
     BetDetail VARCHAR(100), -- this is the team that the user bet on
     BetLine INT, -- ex 100, -250
@@ -59,7 +58,6 @@ SELECT
     B.EventID,
     U.UserID,
     U.Username AS Username,
-    B.Sport,
     B.BetType,
     B.BetDetail,
     B.Amount,
