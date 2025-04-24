@@ -88,8 +88,9 @@ app.get('/welcome', (req, res) => {
 
 // TODO - Include your API routes here
 app.get('/', (req, res) => {
-    res.send("pages/login")
-})
+  res.redirect('/login'); // This will redirect to the actual login route
+});
+
 
 app.get('/login', (req, res) => {
     //TODO RENDER THE LOGIN PAGE
