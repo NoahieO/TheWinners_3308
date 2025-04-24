@@ -329,9 +329,11 @@ app.post('/bets', isAuthenticated, async (req, res) => {
 
     res.redirect('/profile');
   } catch (err) {
-    console.error(err);
+    console.error('Error placing bet:', err.message || err);
+    console.error(err.stack); // <-- log full error stack
     res.status(500).send("Internal error placing bet.");
   }
+  
 });
 
 
