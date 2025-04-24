@@ -12,9 +12,7 @@ const bodyParser = require('body-parser');
 const session = require('express-session'); // To set the session object. To store or access session data, use the `req.session`, which is (generally) serialized as JSON by the store.
 const bcrypt = require('bcryptjs'); //  To hash passwords
 const axios = require('axios'); // To make HTTP requests from our server. We'll learn more about it in Part C.
-const api_key = process.env.ODDS_API_KEY;
-
-
+const api_key = process.env.API_KEY
 
 // *****************************************************
 // <!-- Section 2 : Connect to DB -->
@@ -30,21 +28,25 @@ const hbs = handlebars.create({
   
 
 
-const db = pgp({
-  connectionString: process.env.DATABASE_URL,
-  ssl: {
-    rejectUnauthorized: false // Render requires this for SSL
-  }
-});
+// database configuration
+const dbConfig = {
+  host: 'db', // the database server
+  port: 5432, // the database port
+  database: process.env.POSTGRES_DB, // the database name
+  user: process.env.POSTGRES_USER, // the user account to connect with
+  password: process.env.POSTGRES_PASSWORD, // the password of the user account
+};
 
-// Test the database connection
+const db = pgp(dbConfig);
+
+// test your database
 db.connect()
   .then(obj => {
-    console.log('Database connection successful');
-    obj.done();
+    console.log('Database connection successful'); // you can view this message in the docker compose logs
+    obj.done(); // success, release the connection;
   })
   .catch(error => {
-    console.error('Database connection error:', error.message || error);
+    console.log('ERROR:', error.message || error);
   });
 
 // *****************************************************
@@ -88,9 +90,8 @@ app.get('/welcome', (req, res) => {
 
 // TODO - Include your API routes here
 app.get('/', (req, res) => {
-  res.redirect('/login'); // This will redirect to the actual login route
-});
-
+    res.render("pages/login")
+})
 
 app.get('/login', (req, res) => {
     //TODO RENDER THE LOGIN PAGE
@@ -107,7 +108,7 @@ app.get('/home', async (req, res) => {
         oddsFormat: 'american'
       }
     });
-    invalid_sports = ["baseball_ncaa", "icehockey_liiga", "cricket_psl"];
+    invalid_sports = ["baseball_ncaa", "icehockey_liiga", "cricket_psl", "soccer_conmebol_copa_sudamericana"];
     const events = response.data
     .filter(event => {
       return (
@@ -311,18 +312,17 @@ app.get('/logout', (req, res) => {
 
 // -- Bets Routes --
 app.post('/bets', isAuthenticated, async (req, res) => {
-  const { eventId, amount, betType, betDetail, betLine } = req.body;
+  const { eventId, amount, sport, betType, betDetail, betLine } = req.body;
   const userId = req.session.user.userid;
   console.log("Bet Line: ",betLine);
   const int_betLine = parseInt(betLine, 10);
   try {
     
     await db.none(
-      `INSERT INTO Bets (UserID, EventID, Amount, BetType, BetDetail, BetLine) 
-       VALUES ($1, $2, $3, $4, $5, $6)`,
-      [userId, eventId, amount, betType, betDetail, int_betLine]
+      `INSERT INTO Bets (UserID, EventID, Amount, Sport, BetType, BetDetail, BetLine) 
+       VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+      [userId, eventId, amount, sport, betType, betDetail, int_betLine]
     );
-    
 
     await db.none('UPDATE Users SET Balance = Balance - $1 WHERE UserID = $2', [amount, userId]);
     await db.none('INSERT INTO Transactions (UserID, Amount, Type) VALUES ($1, $2, \'bet\')', [userId, -amount]);
