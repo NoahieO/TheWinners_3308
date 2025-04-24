@@ -311,16 +311,16 @@ app.get('/logout', (req, res) => {
 
 // -- Bets Routes --
 app.post('/bets', isAuthenticated, async (req, res) => {
-  const { eventId, amount, sport, betType, betDetail, betLine } = req.body;
+  const { eventId, amount, betType, betDetail, betLine } = req.body;
   const userId = req.session.user.userid;
   console.log("Bet Line: ",betLine);
   const int_betLine = parseInt(betLine, 10);
   try {
     
     await db.none(
-      `INSERT INTO Bets (UserID, EventID, Amount, Sport, BetType, BetDetail, BetLine) 
-       VALUES ($1, $2, $3, $4, $5, $6, $7)`,
-      [userId, eventId, amount, sport, betType, betDetail, int_betLine]
+      `INSERT INTO Bets (UserID, EventID, Amount, BetType, BetDetail, BetLine) 
+       VALUES ($1, $2, $3, $4, $5, $6,)`,
+      [userId, eventId, amount, betType, betDetail, int_betLine]
     );
 
     await db.none('UPDATE Users SET Balance = Balance - $1 WHERE UserID = $2', [amount, userId]);
