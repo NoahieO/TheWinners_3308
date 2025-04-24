@@ -319,7 +319,7 @@ app.post('/bets', isAuthenticated, async (req, res) => {
     
     await db.none(
       `INSERT INTO Bets (UserID, EventID, Amount, BetType, BetDetail) 
-       VALUES ($1, $2, $3, $4, $5, $6)`,
+       VALUES ($1, $2, $3, $4, $5)`,
       [userId, eventId, amount, betType, betDetail,]
     );
 
