@@ -318,9 +318,9 @@ app.post('/bets', isAuthenticated, async (req, res) => {
   try {
     
     await db.none(
-      `INSERT INTO Bets (UserID, EventID, Amount, BetType, BetDetail, BetLine) 
+      `INSERT INTO Bets (UserID, EventID, Amount, BetType, BetDetail) 
        VALUES ($1, $2, $3, $4, $5, $6)`,
-      [userId, eventId, amount, betType, betDetail, int_betLine]
+      [userId, eventId, amount, betType, betDetail,]
     );
 
     await db.none('UPDATE Users SET Balance = Balance - $1 WHERE UserID = $2', [amount, userId]);
