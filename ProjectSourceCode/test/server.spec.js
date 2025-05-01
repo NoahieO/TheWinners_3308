@@ -82,7 +82,18 @@ describe('Redirect testing for protected routes', () => {
   });
 });
 
-describe('Negative login attempt - incorrect password', () => {
+describe('POST /login - Login API Tests', () => {
+  it('should login successfully with correct credentials', (done) => {
+    chai.request(server)
+      .post('/login')
+      .send({ username: 'existinguser', password: 'testpassword' })
+      .redirects(0)
+      .end((err, res) => {
+        expect(res).to.have.status(302);
+        expect(res.headers.location).to.equal('/discover');
+        done();
+      });
+  });
   it('should return an error message for incorrect password', (done) => {
     chai.request(server)
       .post('/login')
